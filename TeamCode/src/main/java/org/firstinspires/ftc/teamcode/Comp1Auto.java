@@ -102,6 +102,20 @@ public class Comp1Auto extends LinearOpMode {
         public Action stopSpin() {
             return new stopSpin();
         }
+        public class frontIntake implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                outtakeRotate.setPower(0);
+                MidIntake.setPower(-1);
+                FrontIntake.setPower(1);
+                return false;
+            }
+        }
+        public Action frontIntake() {
+            return new frontIntake();
+        }
 
 
 
@@ -120,13 +134,16 @@ public class Comp1Auto extends LinearOpMode {
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
                 .waitSeconds(2);
-                //.strafeToLinearHeading(new Vector2d(15.5, 12), Math.toRadians(135));
+                //.strafeToLinearHeading(new Vector2d(5, 12), Math.toRadians(0));
         TrajectoryActionBuilder tab2 = tab1.endTrajectory().fresh()
                 .waitSeconds(4);
                 //.strafeToLinearHeading(new Vector2d(20, 10), Math.toRadians(135));
+        TrajectoryActionBuilder tab3 = tab2.endTrajectory().fresh()
+                .waitSeconds(1)
+                .strafeToLinearHeading(new Vector2d(5, 12), Math.toRadians(0));
 
 
-        Action trajectoryActionCloseOut = tab2.endTrajectory().fresh()
+        Action trajectoryActionCloseOut = tab3.endTrajectory().fresh()
                 .waitSeconds(2)
                 .build();
 
@@ -167,7 +184,8 @@ public class Comp1Auto extends LinearOpMode {
                         tab1.build(),
                         outtake.intakeBalls(),
                         tab2.build(),
-                        outtake.stopIntake(),
+                        outtake.frontIntake(),
+                        tab3.build(),
                         outtake.stopSpin(),
                         trajectoryActionCloseOut
 
